@@ -7,13 +7,21 @@ gravity_force = 0.5;
 max_fall_speed = 10;
 move_x = 0;
 move_y = 0;
-// Dash
-dash_multiplier = 2;
-dash_time = 4;
-dash_cooldown = 0;
+
+// DASH 
+// Speed
+dash_speed = 15;
+// Time and Cooldown
+dash_time = 11;
+dash_timer = 0;
+dash_cooldown = 20; 
+dash_cooldown_timer = 0;
+// Facing
 facing = 1;
+
 // STATE VARIABLES
 is_grounded = false;
+is_dashing = false;
  // is_climbing = false;
  // climb_speed = 2.5;
  
