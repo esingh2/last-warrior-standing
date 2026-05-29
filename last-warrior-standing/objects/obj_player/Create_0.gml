@@ -10,11 +10,11 @@ move_y = 0;
 
 // DASH 
 // Speed
-dash_speed = 15;
+dash_speed = 10;
 // Time and Cooldown
-dash_time = 11;
+dash_time = 15;
 dash_timer = 0;
-dash_cooldown = 20; 
+dash_cooldown = 80; 
 dash_cooldown_timer = 0;
 // Facing
 facing = 1;
