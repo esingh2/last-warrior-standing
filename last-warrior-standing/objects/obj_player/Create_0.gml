@@ -22,6 +22,7 @@ facing = 1;
 // STATE VARIABLES
 is_grounded = false;
 is_dashing = false;
+is_attacking = false;
  // is_climbing = false;
  // climb_speed = 2.5;
  
