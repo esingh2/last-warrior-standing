@@ -8,6 +8,28 @@ if (move_dir != 0) {
     facing = move_dir;
 }
 
+// PLAYER ANIMATIONS
+if (move_dir > 0) {
+	sprite_index = spr_walk_right;
+}
+else if (move_dir < 0) {
+	sprite_index = spr_walk_left;
+}
+if (move_x != 0) {
+	image_speed = 1;
+}
+else {
+	image_speed = 0;
+	image_index = 1;
+}
+if (is_dashing) {
+	image_speed = 1;
+	if (facing == 1) {
+		sprite_index = spr_dash_right 
+	} else { 
+		sprite_index = spr_dash_left;
+	}
+}
 // DASH TRIGGER & TIMERS
 if (dash_input && dash_cooldown_timer <= 0 && !is_dashing) {
     is_dashing = true;
