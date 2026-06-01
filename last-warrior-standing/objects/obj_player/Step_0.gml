@@ -8,30 +8,8 @@ if (move_dir != 0) {
     facing = move_dir;
 }
 
-// PLAYER ANIMATIONS
-if (move_dir > 0) {
-	sprite_index = spr_walk_right;
-}
-else if (move_dir < 0) {
-	sprite_index = spr_walk_left;
-}
-if (move_x != 0) {
-	image_speed = 1;
-}
-else {
-	image_speed = 0;
-	image_index = 1;
-}
-if (is_dashing) {
-	image_speed = 1;
-	if (facing == 1) {
-		sprite_index = spr_dash_right 
-	} else { 
-		sprite_index = spr_dash_left;
-	}
-}
 // DASH TRIGGER & TIMERS
-if (dash_input && dash_cooldown_timer <= 0 && !is_dashing) {
+if (dash_input && dash_cooldown_timer <= 0 && !is_dashing && move_dir != 0) {
     is_dashing = true;
     dash_timer = dash_time;
 }
@@ -75,7 +53,55 @@ if (is_ceiling && move_y < 0) {
     move_y = 0;
 }
 
-
+// PLAYER ANIMATIONS
+if (is_dashing) {
+    image_speed = 1;
+    if (facing == 1) {
+        sprite_index = spr_dash_right;
+    } else { 
+        sprite_index = spr_dash_left;
+    }
+} 
+else if (!is_grounded) {
+    // Airborne Animations
+    if (facing == 1) {
+        sprite_index = spr_jump_right; 
+    } else {
+        sprite_index = spr_jump_left; 
+    }
+    
+    // Explicitly freeze the speed here so it doesn't loop automatically
+    image_speed = 0; 
+    
+    // Choose the exact frame based on vertical movement
+    if (move_y < -1) {
+        image_index = 0; // First frame: Rising
+    } 
+    else if (move_y >= -1 && move_y <= 1) {
+        image_index = 1; // Second frame: Apex/Peak
+    } 
+    else {
+        image_index = 2; // Third frame: Falling
+    }
+}
+else {
+    // Grounded Animations
+    image_speed = 1; // Explicitly turn image speed BACK ON for ground movement
+    
+    if (move_dir > 0) {
+        sprite_index = spr_walk_right;
+    }
+    else if (move_dir < 0) {
+        sprite_index = spr_walk_left;
+    }
+    else {
+        if (facing == 1) {
+            sprite_index = spr_idle_right;
+        } else {
+            sprite_index = spr_idle_left;
+        }
+    }
+}
 // 5. ROOM BOUNDS & COLLISIONS
 if (y < -200 || y > room_height+20 || x < -20 || x > room_width+20) {
     room_restart();
@@ -88,7 +114,7 @@ if (place_meeting(x, y, obj_blocker)) {
 
 // ACTUALLY MOVE THE PLAYER
 move_and_collide(move_x, move_y, ground_object);
-
+show_debug_message("move_x: " + string(move_x) + " | move_y: " + string(move_y) + " | grounded: " + string(is_grounded));
 // COLLECTED
 
 // GO TO NEXT ROOM

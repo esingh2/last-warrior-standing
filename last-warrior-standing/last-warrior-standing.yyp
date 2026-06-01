@@ -38,6 +38,8 @@
     {"id":{"name":"spr_dash_left","path":"sprites/spr_dash_left/spr_dash_left.yy",},},
     {"id":{"name":"spr_dash_right","path":"sprites/spr_dash_right/spr_dash_right.yy",},},
     {"id":{"name":"spr_ground","path":"sprites/spr_ground/spr_ground.yy",},},
+    {"id":{"name":"spr_idle_left","path":"sprites/spr_idle_left/spr_idle_left.yy",},},
+    {"id":{"name":"spr_idle_right","path":"sprites/spr_idle_right/spr_idle_right.yy",},},
     {"id":{"name":"spr_inair_left","path":"sprites/spr_inair_left/spr_inair_left.yy",},},
     {"id":{"name":"spr_inair_right","path":"sprites/spr_inair_right/spr_inair_right.yy",},},
     {"id":{"name":"spr_jump_left","path":"sprites/spr_jump_left/spr_jump_left.yy",},},
