@@ -1,15 +1,22 @@
-// INPUTS & DIRECTION
+// 1. INPUTS & DIRECTION
 var move_dir = keyboard_check(ord("D")) - keyboard_check(ord("A"));
 jump_pressed = keyboard_check_pressed(vk_space);
 dash_input = keyboard_check_pressed(vk_shift);
+attack_input = mouse_check_button_pressed(mb_left);
 
-// FACING (FOR ABILITES & DASH)
+// FACING (FOR ABILITIES & DASH)
 if (move_dir != 0) {
     facing = move_dir;
 }
 
+// TRIGGER ATTACK 
+if (attack_input && !is_dashing && !is_attacking) { 
+    is_attacking = true;
+    image_index = 0;
+}
+
 // DASH TRIGGER & TIMERS
-if (dash_input && dash_cooldown_timer <= 0 && !is_dashing && move_dir != 0) {
+if (dash_input && dash_cooldown_timer <= 0 && !is_dashing && !is_attacking && move_dir != 0) {
     is_dashing = true;
     dash_timer = dash_time;
 }
@@ -21,14 +28,23 @@ if (dash_cooldown_timer > 0) {
 
 
 // MOVEMENT
-if (is_dashing) {
+if (is_attacking) {
+    move_x = 0;
+    
+    // Gravity calculation during attack
+    if (!is_grounded && move_y < max_fall_speed) {
+        move_y += gravity_force;
+    }
+}
+else if (is_dashing) {
     move_x = facing * dash_speed;
+    move_y = 0; // Keep vertical movement locked during dash
     dash_timer--;
     
     // Check if dash finished
     if (dash_timer <= 0) {
         is_dashing = false;
-        dash_cooldown_timer = dash_cooldown; // Start the 20-frame cooldown
+        dash_cooldown_timer = dash_cooldown; 
     }
 } else {
     // Normal walking movement
@@ -42,10 +58,10 @@ is_ceiling = place_meeting(x, y-2, ground_object);
 
 if (is_grounded) {
     move_y = 0;
-    if (jump_pressed) {
+    if (jump_pressed && !is_attacking) { // Added protection so you can't jump mid-swing
         move_y = jump_speed;
     }
-} else if (move_y < max_fall_speed) {
+} else if (!is_attacking && move_y < max_fall_speed) { // FIXED: Skip normal gravity calculation if already done in attacking block
     move_y += gravity_force;
 }
 
@@ -53,8 +69,18 @@ if (is_ceiling && move_y < 0) {
     move_y = 0;
 }
 
+
 // PLAYER ANIMATIONS
-if (is_dashing) {
+if (is_attacking) {
+    image_speed = 1; 
+    
+    if (facing == 1) {
+        sprite_index = spr_attack_right; 
+    } else {
+        sprite_index = spr_attack_left;
+    }
+}
+else if (is_dashing) {
     image_speed = 1;
     if (facing == 1) {
         sprite_index = spr_dash_right;
@@ -63,30 +89,26 @@ if (is_dashing) {
     }
 } 
 else if (!is_grounded) {
-    // Airborne Animations
     if (facing == 1) {
         sprite_index = spr_jump_right; 
     } else {
         sprite_index = spr_jump_left; 
     }
     
-    // Explicitly freeze the speed here so it doesn't loop automatically
     image_speed = 0; 
     
-    // Choose the exact frame based on vertical movement
     if (move_y < -1) {
-        image_index = 0; // First frame: Rising
+        image_index = 0; 
     } 
     else if (move_y >= -1 && move_y <= 1) {
-        image_index = 1; // Second frame: Apex/Peak
+        image_index = 1; 
     } 
     else {
-        image_index = 2; // Third frame: Falling
+        image_index = 2; 
     }
 }
 else {
-    // Grounded Animations
-    image_speed = 1; // Explicitly turn image speed BACK ON for ground movement
+    image_speed = 1; 
     
     if (move_dir > 0) {
         sprite_index = spr_walk_right;
@@ -102,6 +124,7 @@ else {
         }
     }
 }
+
 // 5. ROOM BOUNDS & COLLISIONS
 if (y < -200 || y > room_height+20 || x < -20 || x > room_width+20) {
     room_restart();
@@ -114,7 +137,7 @@ if (place_meeting(x, y, obj_blocker)) {
 
 // ACTUALLY MOVE THE PLAYER
 move_and_collide(move_x, move_y, ground_object);
-show_debug_message("move_x: " + string(move_x) + " | move_y: " + string(move_y) + " | grounded: " + string(is_grounded));
+
 // COLLECTED
 
 // GO TO NEXT ROOM
