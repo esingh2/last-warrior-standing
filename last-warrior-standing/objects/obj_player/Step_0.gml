@@ -3,7 +3,7 @@ var move_dir = keyboard_check(ord("D")) - keyboard_check(ord("A"));
 jump_pressed = keyboard_check_pressed(vk_space);
 dash_input = keyboard_check_pressed(vk_shift);
 attack_input = mouse_check_button_pressed(mb_left);
-
+spell_input = mouse_check_button_pressed(mb_right);
 // FACING (FOR ABILITIES & DASH)
 if (move_dir != 0) {
     facing = move_dir;
@@ -13,6 +13,41 @@ if (move_dir != 0) {
 if (attack_input && !is_dashing && !is_attacking) { 
     is_attacking = true;
     image_index = 0;
+	
+	// Update facing direction based on mouse position
+    if (mouse_x > x) {
+        facing = 1;
+    } else {
+        facing = -1;
+    }
+	
+	if (attack_combo == 0) {
+		if (facing == 1) sprite_index = spr_attack_right;
+		else sprite_index = spr_attack_left;
+		
+		attack_combo = 1;
+	}
+	else if (attack_combo == 1) {
+		if (facing == 1) sprite_index = spr_attack_k2_right;
+		else sprite_index = spr_attack_k2_left;
+		
+		attack_combo = 0;
+	}
+}
+
+// TRIGGER SPELL
+if (spell_input && spell_cooldown_timer <= 0 && !is_dashing && !is_attacking) {
+    is_attacking = true;
+    image_index = 0;
+    
+    if (mouse_x > x) facing = 1;
+    else facing = -1;
+    
+    // Set the spell cast sprites
+    if (facing == 1) sprite_index = spr_spell_right;
+    else sprite_index = spr_spell_left;
+
+    spell_cooldown_timer = spell_cooldown_max;
 }
 
 // DASH TRIGGER & TIMERS
@@ -26,6 +61,10 @@ if (dash_cooldown_timer > 0) {
     dash_cooldown_timer--;
 }
 
+// Spell Cooldown Timer
+if (spell_cooldown_timer > 0) {
+    spell_cooldown_timer--;
+}
 
 // MOVEMENT
 if (is_attacking) {
@@ -73,12 +112,6 @@ if (is_ceiling && move_y < 0) {
 // PLAYER ANIMATIONS
 if (is_attacking) {
     image_speed = 1; 
-    
-    if (facing == 1) {
-        sprite_index = spr_attack_right; 
-    } else {
-        sprite_index = spr_attack_left;
-    }
 }
 else if (is_dashing) {
     image_speed = 1;

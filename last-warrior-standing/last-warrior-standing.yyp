@@ -45,6 +45,8 @@
     {"id":{"name":"spr_jump_left","path":"sprites/spr_jump_left/spr_jump_left.yy",},},
     {"id":{"name":"spr_jump_right","path":"sprites/spr_jump_right/spr_jump_right.yy",},},
     {"id":{"name":"spr_player","path":"sprites/spr_player/spr_player.yy",},},
+    {"id":{"name":"spr_spell_left","path":"sprites/spr_spell_left/spr_spell_left.yy",},},
+    {"id":{"name":"spr_spell_right","path":"sprites/spr_spell_right/spr_spell_right.yy",},},
     {"id":{"name":"spr_walk_left","path":"sprites/spr_walk_left/spr_walk_left.yy",},},
     {"id":{"name":"spr_walk_right","path":"sprites/spr_walk_right/spr_walk_right.yy",},},
   ],

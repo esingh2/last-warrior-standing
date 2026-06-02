@@ -7,10 +7,10 @@
   "ResourceOrderSettings":[
     {"name":"obj_blocker","order":2,"path":"objects/obj_blocker/obj_blocker.yy",},
     {"name":"obj_ground","order":1,"path":"objects/obj_ground/obj_ground.yy",},
-    {"name":"spr_attack_k2_left","order":5,"path":"sprites/spr_attack_k2_left/spr_attack_k2_left.yy",},
-    {"name":"spr_attack_k2_right","order":4,"path":"sprites/spr_attack_k2_right/spr_attack_k2_right.yy",},
-    {"name":"spr_attack_k3_left","order":9,"path":"sprites/spr_attack_k3_left/spr_attack_k3_left.yy",},
-    {"name":"spr_attack_k3_right","order":8,"path":"sprites/spr_attack_k3_right/spr_attack_k3_right.yy",},
+    {"name":"spr_attack_k2_left","order":9,"path":"sprites/spr_attack_k2_left/spr_attack_k2_left.yy",},
+    {"name":"spr_attack_k2_right","order":8,"path":"sprites/spr_attack_k2_right/spr_attack_k2_right.yy",},
+    {"name":"spr_attack_k3_left","order":5,"path":"sprites/spr_attack_k3_left/spr_attack_k3_left.yy",},
+    {"name":"spr_attack_k3_right","order":4,"path":"sprites/spr_attack_k3_right/spr_attack_k3_right.yy",},
     {"name":"spr_attack_left","order":7,"path":"sprites/spr_attack_left/spr_attack_left.yy",},
     {"name":"spr_attack_right","order":6,"path":"sprites/spr_attack_right/spr_attack_right.yy",},
     {"name":"spr_dash_left","order":3,"path":"sprites/spr_dash_left/spr_dash_left.yy",},
@@ -23,6 +23,8 @@
     {"name":"spr_jump_left","order":13,"path":"sprites/spr_jump_left/spr_jump_left.yy",},
     {"name":"spr_jump_right","order":11,"path":"sprites/spr_jump_right/spr_jump_right.yy",},
     {"name":"spr_player","order":2,"path":"sprites/spr_player/spr_player.yy",},
+    {"name":"spr_spell_left","order":17,"path":"sprites/spr_spell_left/spr_spell_left.yy",},
+    {"name":"spr_spell_right","order":16,"path":"sprites/spr_spell_right/spr_spell_right.yy",},
     {"name":"spr_walk_left","order":1,"path":"sprites/spr_walk_left/spr_walk_left.yy",},
   ],
 }

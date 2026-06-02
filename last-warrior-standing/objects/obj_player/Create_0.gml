@@ -8,6 +8,11 @@ max_fall_speed = 10;
 move_x = 0;
 move_y = 0;
 
+// Attacks & Abilities
+attack_combo = 0;
+spell_cooldown_timer = 0; 
+spell_cooldown_max = 240;
+
 // DASH 
 // Speed
 dash_speed = 10;
