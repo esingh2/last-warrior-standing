@@ -28,6 +28,8 @@ facing = 1;
 is_grounded = false;
 is_dashing = false;
 is_attacking = false;
+is_crouching = false;
+is_crouch_attacking = false;
  // is_climbing = false;
  // climb_speed = 2.5;
  

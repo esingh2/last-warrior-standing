@@ -4,46 +4,60 @@ jump_pressed = keyboard_check_pressed(vk_space);
 dash_input = keyboard_check_pressed(vk_shift);
 attack_input = mouse_check_button_pressed(mb_left);
 spell_input = mouse_check_button_pressed(mb_right);
+crouch_input = keyboard_check(ord("S"));
 // FACING (FOR ABILITIES & DASH)
 if (move_dir != 0) {
     facing = move_dir;
 }
 
-// TRIGGER ATTACK 
-if (attack_input && !is_dashing && !is_attacking) { 
-    is_attacking = true;
-    image_index = 0;
-	
-	// Update facing direction based on mouse position
-    if (mouse_x > x) {
-        facing = 1;
-    } else {
-        facing = -1;
-    }
-	
-	if (attack_combo == 0) {
-		if (facing == 1) sprite_index = spr_attack_right;
-		else sprite_index = spr_attack_left;
-		
-		attack_combo = 1;
-	}
-	else if (attack_combo == 1) {
-		if (facing == 1) sprite_index = spr_attack_k2_right;
-		else sprite_index = spr_attack_k2_left;
-		
-		attack_combo = 0;
-	}
+// CROUCH CHECK (Only on the ground, and not during locked states)
+if (is_grounded && crouch_input && !is_dashing && !is_attacking) {
+    is_crouching = true;
+} else {
+    is_crouching = false;
 }
 
-// TRIGGER SPELL
-if (spell_input && spell_cooldown_timer <= 0 && !is_dashing && !is_attacking) {
-    is_attacking = true;
+// TRIGGER ATTACK 
+if (attack_input && !is_dashing && !is_attacking && !is_crouch_attacking) { 
+    
+    // Update facing direction based on mouse position first
+    if (mouse_x > x) facing = 1;
+    else facing = -1;
+
+    if (is_crouching) {
+        // Trigger Crouch Attack
+        is_crouch_attacking = true;
+        image_index = 0;
+        
+        if (facing == 1) sprite_index = spr_crouch_attack_right;
+        else sprite_index = spr_crouch_attack_left;
+        
+    } else {
+        // Trigger Normal Attack Combo
+        is_attacking = true;
+        image_index = 0;
+        
+        if (attack_combo == 0) {
+            if (facing == 1) sprite_index = spr_attack_right;
+            else sprite_index = spr_attack_left;
+            attack_combo = 1;
+        }
+        else if (attack_combo == 1) {
+            if (facing == 1) sprite_index = spr_attack_k2_right;
+            else sprite_index = spr_attack_k2_left;
+            attack_combo = 0;
+        }
+    }
+}
+
+// TRIGGER SPELL (Prevent casting mid-crouch-attack)
+if (spell_input && spell_cooldown_timer <= 0 && !is_dashing && !is_attacking && !is_crouch_attacking) {
+    is_attacking = true; // Treats spellcast as normal attack state lock
     image_index = 0;
     
     if (mouse_x > x) facing = 1;
     else facing = -1;
     
-    // Set the spell cast sprites
     if (facing == 1) sprite_index = spr_spell_right;
     else sprite_index = spr_spell_left;
 
@@ -67,7 +81,7 @@ if (spell_cooldown_timer > 0) {
 }
 
 // MOVEMENT
-if (is_attacking) {
+if (is_attacking || is_crouch_attacking) {
     move_x = 0;
     
     // Gravity calculation during attack
@@ -85,7 +99,12 @@ else if (is_dashing) {
         is_dashing = false;
         dash_cooldown_timer = dash_cooldown; 
     }
-} else {
+} 
+else if (is_crouching) {
+    // You can change '0' to 'move_dir * (move_speed * 0.4)' if you want a crouch-walk
+move_x = move_dir * (move_speed * 0.4);
+}
+else {
     // Normal walking movement
     move_x = move_dir * move_speed; 
 }
@@ -97,10 +116,10 @@ is_ceiling = place_meeting(x, y-2, ground_object);
 
 if (is_grounded) {
     move_y = 0;
-    if (jump_pressed && !is_attacking) { // Added protection so you can't jump mid-swing
+if (jump_pressed && !is_attacking && !is_crouch_attacking && !is_crouching) { 
         move_y = jump_speed;
     }
-} else if (!is_attacking && move_y < max_fall_speed) { // FIXED: Skip normal gravity calculation if already done in attacking block
+} else if (!is_attacking && !is_crouch_attacking && move_y < max_fall_speed) { 
     move_y += gravity_force;
 }
 
@@ -110,7 +129,10 @@ if (is_ceiling && move_y < 0) {
 
 
 // PLAYER ANIMATIONS
-if (is_attacking) {
+if (is_crouch_attacking) {
+    image_speed = 1;
+}
+else if (is_attacking) {
     image_speed = 1; 
 }
 else if (is_dashing) {
@@ -138,6 +160,23 @@ else if (!is_grounded) {
     } 
     else {
         image_index = 2; 
+    }
+}
+else if (is_crouching) {
+    var target_crouch_sprite = (facing == 1) ? spr_crouch_right : spr_crouch_left;
+    
+    // Only change the sprite if we aren't already using it (prevents animation resetting)
+    if (sprite_index != target_crouch_sprite) {
+        sprite_index = target_crouch_sprite;
+        image_index = 0; // Start the transition cleanly
+    }
+    
+    // If the animation reaches the last frame, freeze it there so they stay down
+    if (image_index >= image_number - 1) {
+        image_speed = 0;
+        image_index = image_number - 1; 
+    } else {
+        image_speed = 1; // Play the crouch-down transition
     }
 }
 else {
