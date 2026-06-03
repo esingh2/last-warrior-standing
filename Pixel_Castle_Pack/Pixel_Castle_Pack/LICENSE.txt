@@ -1,0 +1,22 @@
+Pixel Castle Pack © 2025 Noxa
+https://noxa-art.itch.io
+
+This asset pack was created using AI-assisted tools (Stable Diffusion + manual editing)  
+and is distributed under the **CreativeML Open RAIL-M License**.
+
+You are free to:
+✔ Use these backgrounds in commercial and non-commercial projects  
+✔ Modify, crop, recolor, and combine them  
+✔ Include them in games, videos, or other creative works  
+✔ Credit is appreciated but not required (“Art by Noxa”)
+
+You may not:
+✖ Resell or redistribute the images as standalone files or within competing asset packs  
+✖ Claim authorship of the original work  
+✖ Use these assets for unlawful, hateful, or defamatory purposes (as per RAIL-M)
+
+Notes:
+– Each background was generated from scratch using licensed AI models and refined manually  
+– Full RAIL-M text: https://huggingface.co/spaces/CompVis/stable-diffusion-license  
+
+Enjoy creating beautiful games! 💫
