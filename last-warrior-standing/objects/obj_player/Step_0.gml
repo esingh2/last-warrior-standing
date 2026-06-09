@@ -205,6 +205,9 @@ if (y < -200 || y > room_height+20 || x < -20 || x > room_width+20) {
 // BLOCKER
 if (place_meeting(x, y, obj_blocker)) {
     move_x *= blocked_speed;
+} else {
+    // If not touching the blocker, make sure we use normal speed
+    move_x *= move_speed; 
 }
 
 // ACTUALLY MOVE THE PLAYER
