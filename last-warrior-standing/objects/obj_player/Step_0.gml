@@ -5,6 +5,7 @@ dash_input = keyboard_check_pressed(vk_shift);
 attack_input = mouse_check_button_pressed(mb_left);
 spell_input = mouse_check_button_pressed(mb_right);
 crouch_input = keyboard_check(ord("S"));
+
 // FACING (FOR ABILITIES & DASH)
 if (move_dir != 0) {
     facing = move_dir;
@@ -80,17 +81,37 @@ if (spell_cooldown_timer > 0) {
     spell_cooldown_timer--;
 }
 
-// MOVEMENT
+// ==========================================
+// BLOCKER SPEED MODIFIER CALCULATIONS
+// ==========================================
+var _h_modifier = 1.0;
+var _v_modifier = 1.0;
+
+// HORIZONTAL MODIFIER: Uses look-ahead so you don't get stuck entering/leaving walls
+if (place_meeting(x + move_dir * move_speed, y, blocker_object) || place_meeting(x, y, blocker_object)) {
+    _h_modifier = blocked_speed / move_speed;
+}
+
+// VERTICAL MODIFIER: Only applies if you are physically inside/touching it right now!
+if (place_meeting(x, y, blocker_object)) {
+    _v_modifier = blocked_speed / move_speed; 
+}
+
+
+// ==========================================
+// MOVEMENT STATES
+// ==========================================
 if (is_attacking || is_crouch_attacking) {
     move_x = 0;
     
-    // Gravity calculation during attack
+    // Gravity calculation during attack (slowed down if in blocker)
     if (!is_grounded && move_y < max_fall_speed) {
-        move_y += gravity_force;
+        move_y += gravity_force * _v_modifier;
     }
 }
 else if (is_dashing) {
-    move_x = facing * dash_speed;
+    // Dash speed is now dragged down by the blocker modifier
+    move_x = (facing * dash_speed) * _h_modifier;
     move_y = 0; // Keep vertical movement locked during dash
     dash_timer--;
     
@@ -101,26 +122,31 @@ else if (is_dashing) {
     }
 } 
 else if (is_crouching) {
-    // You can change '0' to 'move_dir * (move_speed * 0.4)' if you want a crouch-walk
-move_x = move_dir * (move_speed * 0.4);
+    // Crouch walk speed affected by the blocker modifier
+    move_x = move_dir * (move_speed * 0.4) * _h_modifier;
 }
 else {
-    // Normal walking movement
-    move_x = move_dir * move_speed; 
+    // Normal walking movement affected by the blocker modifier
+    move_x = move_dir * move_speed * _h_modifier; 
 }
 
 
+// ==========================================
 // 4. VERTICAL MOVEMENT (Jumping / Gravity)
-is_grounded = place_meeting(x, y+2, ground_object);
-is_ceiling = place_meeting(x, y-2, ground_object);
+// ==========================================
+// Check for ground and ceiling using BOTH the ground object and the blocker object
+is_grounded = place_meeting(x, y+2, ground_object) || place_meeting(x, y+2, blocker_object);
+is_ceiling = place_meeting(x, y-2, ground_object) || place_meeting(x, y-2, blocker_object);
 
 if (is_grounded) {
     move_y = 0;
-if (jump_pressed && !is_attacking && !is_crouch_attacking && !is_crouching) { 
-        move_y = jump_speed;
+    if (jump_pressed && !is_attacking && !is_crouch_attacking && !is_crouching) { 
+        // Jump height behaves perfectly normal outside, but gets restricted inside
+        move_y = jump_speed * _v_modifier;
     }
 } else if (!is_attacking && !is_crouch_attacking && move_y < max_fall_speed) { 
-    move_y += gravity_force;
+    // Falling is slowed down only inside the blocker
+    move_y += gravity_force * _v_modifier;
 }
 
 if (is_ceiling && move_y < 0) {
@@ -202,16 +228,8 @@ if (y < -200 || y > room_height+20 || x < -20 || x > room_width+20) {
     room_restart();
 }
 
-// BLOCKER
-if (place_meeting(x, y, obj_blocker)) {
-    move_x *= blocked_speed;
-} else {
-    // If not touching the blocker, make sure we use normal speed
-    move_x *= move_speed; 
-}
-
-// ACTUALLY MOVE THE PLAYER
-move_and_collide(move_x, move_y, ground_object);
+// ACTUALLY MOVE THE PLAYER (Accepts both solid structures as an array)
+move_and_collide(move_x, move_y, [ground_object, blocker_object]);
 
 // COLLECTED
 

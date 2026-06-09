@@ -34,7 +34,7 @@ is_crouch_attacking = false;
  // climb_speed = 2.5;
  
 // Blocker
-blocked_speed = 0;
+blocked_speed = 1.5;
 
 // OBJECT REFERENCES
 ground_object = obj_ground;
