@@ -32,5 +32,5 @@
     "path":"sprites/spr_blocker/spr_blocker.yy",
   },
   "spriteMaskId":null,
-  "visible":true,
+  "visible":false,
 }
