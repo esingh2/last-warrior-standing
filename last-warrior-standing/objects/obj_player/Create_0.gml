@@ -1,10 +1,10 @@
 // COLLECTING STUFF
 
 // MOVEMENT VARIABLES
-move_speed = 5;
-jump_speed = -15;
-gravity_force = 0.5;
-max_fall_speed = 10;
+move_speed = 3;
+jump_speed = -8.5;
+gravity_force = 0.35;
+max_fall_speed = 7;
 move_x = 0;
 move_y = 0;
 
@@ -15,9 +15,9 @@ spell_cooldown_max = 240;
 
 // DASH 
 // Speed
-dash_speed = 10;
+dash_speed = 7;
 // Time and Cooldown
-dash_time = 15;
+dash_time = 12;
 dash_timer = 0;
 dash_cooldown = 80; 
 dash_cooldown_timer = 0;
@@ -34,7 +34,7 @@ is_crouch_attacking = false;
  // climb_speed = 2.5;
  
 // Blocker
-blocked_speed = 1.5;
+blocked_speed = 1;
 
 // OBJECT REFERENCES
 ground_object = obj_ground;

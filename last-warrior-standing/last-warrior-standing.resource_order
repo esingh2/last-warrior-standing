@@ -21,6 +21,7 @@
     {"name":"spr_crouch_attack_right","order":18,"path":"sprites/spr_crouch_attack_right/spr_crouch_attack_right.yy",},
     {"name":"spr_crouch_left","order":17,"path":"sprites/spr_crouch_left/spr_crouch_left.yy",},
     {"name":"spr_crouch_right","order":16,"path":"sprites/spr_crouch_right/spr_crouch_right.yy",},
+    {"name":"spr_dash_icon","order":14,"path":"sprites/spr_dash_icon/spr_dash_icon.yy",},
     {"name":"spr_dash_left","order":3,"path":"sprites/spr_dash_left/spr_dash_left.yy",},
     {"name":"spr_dash_right","order":2,"path":"sprites/spr_dash_right/spr_dash_right.yy",},
     {"name":"spr_dungeon_blue_2","order":6,"path":"sprites/spr_dungeon_blue_2/spr_dungeon_blue_2.yy",},
@@ -39,6 +40,7 @@
     {"name":"spr_sewer","order":9,"path":"sprites/spr_sewer/spr_sewer.yy",},
     {"name":"spr_spell_left","order":15,"path":"sprites/spr_spell_left/spr_spell_left.yy",},
     {"name":"spr_spell_right","order":14,"path":"sprites/spr_spell_right/spr_spell_right.yy",},
+    {"name":"spr_spell1_icon","order":15,"path":"sprites/spr_spell1_icon/spr_spell1_icon.yy",},
     {"name":"spr_walk_left","order":1,"path":"sprites/spr_walk_left/spr_walk_left.yy",},
   ],
 }
