@@ -39,3 +39,10 @@ blocked_speed = 1;
 // OBJECT REFERENCES
 ground_object = obj_ground;
 blocker_object = obj_blocker;
+
+// --- SOLID LIGHT GRAY OUTLINE (NO GAP) ---
+player_surf = -1;
+outline_thickness = 1;   // Kept at a solid 1-pixel thickness for sharp edges
+outline_gap = 0;         // <-- Removed the gap completely!
+outline_color = c_ltgray; // Your favorite soft light gray color
+outline_alpha = 0.8;
