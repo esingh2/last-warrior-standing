@@ -22,6 +22,7 @@
     {"name":"spr_crouch_left","order":17,"path":"sprites/spr_crouch_left/spr_crouch_left.yy",},
     {"name":"spr_crouch_right","order":16,"path":"sprites/spr_crouch_right/spr_crouch_right.yy",},
     {"name":"spr_dash_icon","order":14,"path":"sprites/spr_dash_icon/spr_dash_icon.yy",},
+    {"name":"spr_dash_input_icon","order":16,"path":"sprites/spr_dash_input_icon/spr_dash_input_icon.yy",},
     {"name":"spr_dash_left","order":3,"path":"sprites/spr_dash_left/spr_dash_left.yy",},
     {"name":"spr_dash_right","order":2,"path":"sprites/spr_dash_right/spr_dash_right.yy",},
     {"name":"spr_dungeon_blue_2","order":6,"path":"sprites/spr_dungeon_blue_2/spr_dungeon_blue_2.yy",},

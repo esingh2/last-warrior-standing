@@ -2,9 +2,9 @@
 
 // MOVEMENT VARIABLES
 move_speed = 3;
-jump_speed = -8.5;
-gravity_force = 0.35;
-max_fall_speed = 7;
+jump_speed = -6.5;
+gravity_force = 0.30;
+max_fall_speed = 5.5;
 move_x = 0;
 move_y = 0;
 
@@ -46,3 +46,7 @@ outline_thickness = 1;   // Kept at a solid 1-pixel thickness for sharp edges
 outline_gap = 0;         // <-- Removed the gap completely!
 outline_color = c_ltgray; // Your favorite soft light gray color
 outline_alpha = 0.8;
+
+// Position of your cooldown box on the screen
+box_x = 32;  // 32 pixels from the left side of the screen
+box_y = 32;  // 32 pixels from the top of the screen
