@@ -234,3 +234,44 @@ move_and_collide(move_x, move_y, [ground_object, blocker_object]);
 // COLLECTED
 
 // GO TO NEXT ROOM
+// 1. Check if we are touching ANY interactable object
+var _interact_target = instance_place(x, y, obj_interactable);
+
+if (_interact_target != noone) {
+    // 2. If holding "E", increase the timer
+    if (keyboard_check(ord("E"))) {
+        interact_timer += 1; 
+        
+        // Timer completes at 90 frames (1.5 seconds)
+        if (interact_timer >= 90) {
+            
+            // --- THE ACTION SWITCHBOARD ---
+            // This reads the specific variable from the object we are touching!
+            switch (_interact_target.action_type) {
+                
+                case "next_room":
+                    if (room_exists(room_next(room))) {
+                        room_goto_next();
+                    }
+                    break;
+                    
+                case "chest":
+                    // You can add chest-opening logic here later!
+                    show_debug_message("Opened a chest!");
+                    break;
+                    
+                case "lever":
+                    // You can add lever-pulling logic here later!
+                    show_debug_message("Pulled a lever!");
+                    break;
+            }
+            
+            // Reset the timer after the action happens so it doesn't loop
+            interact_timer = 0;
+        }
+    } else {
+        interact_timer = max(0, interact_timer - 2); 
+    }
+} else {
+    interact_timer = 0;
+}

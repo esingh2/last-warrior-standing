@@ -51,3 +51,50 @@ gpu_set_fog(false, c_white, 0, 0);
 
 // 5. DRAW THE REAL PLAYER DIRECTLY ON TOP (IN FULL COLOR)
 draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
+
+draw_self();
+
+// Draw UI if touching any interactable object
+if (place_meeting(x, y, obj_interactable)) {
+    var _ui_x = x;
+    var _ui_y = bbox_top - 10; 
+    
+    // 1. DRAW THE BACKGROUND CIRCLE (Reduced radius from 20 to 14)
+    var _circle_radius = 14; 
+    draw_set_color(c_dkgray);
+    draw_circle(_ui_x, _ui_y, _circle_radius, false); 
+    
+    // 2. DRAW AND SCALE THE SPRITE (Reduced scale from 0.12 to 0.08 to fit the smaller circle)
+    var _scale = 0.06; 
+    
+    // draw_sprite_ext(sprite, subimg, x, y, xscale, yscale, rot, color, alpha);
+    draw_sprite_ext(spr_hold_prompt, -1, _ui_x, _ui_y, _scale, _scale, 0, c_white, 1);
+    
+    // 3. DRAW THE CLOCKWISE PROGRESS RING
+    var _progress = (interact_timer / 90) * 360; 
+    
+    if (_progress > 0) {
+        draw_set_color(c_lime);
+        
+        var _sections = 32; 
+        var _ring_thickness = 3; // Slimmed down the ring thickness slightly to match
+        
+        draw_primitive_begin(pr_trianglestrip);
+        for (var i = 0; i <= _sections; i++) {
+            var _angle = 270 + (i / _sections) * _progress; 
+            if ((i / _sections) * 360 > _progress) break;
+            
+            var _rad = degtorad(_angle);
+            
+            // Outer and Inner edges dynamically adjust to the new _circle_radius
+            var _ox = _ui_x + cos(_rad) * (_circle_radius + 2);
+            var _oy = _ui_y + sin(_rad) * (_circle_radius + 2);
+            var _ix = _ui_x + cos(_rad) * (_circle_radius + 2 - _ring_thickness);
+            var _iy = _ui_y + sin(_rad) * (_circle_radius + 2 - _ring_thickness);
+            
+            draw_vertex(_ox, _oy);
+            draw_vertex(_ix, _iy);
+        }
+        draw_primitive_end();
+    }
+}

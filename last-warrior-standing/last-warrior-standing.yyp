@@ -27,8 +27,10 @@
   "resources":[
     {"id":{"name":"obj_blocker","path":"objects/obj_blocker/obj_blocker.yy",},},
     {"id":{"name":"obj_ground","path":"objects/obj_ground/obj_ground.yy",},},
+    {"id":{"name":"obj_interactable","path":"objects/obj_interactable/obj_interactable.yy",},},
     {"id":{"name":"obj_player","path":"objects/obj_player/obj_player.yy",},},
     {"id":{"name":"Entrance","path":"rooms/Entrance/Entrance.yy",},},
+    {"id":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
     {"id":{"name":"spr_attack_k2_left","path":"sprites/spr_attack_k2_left/spr_attack_k2_left.yy",},},
     {"id":{"name":"spr_attack_k2_right","path":"sprites/spr_attack_k2_right/spr_attack_k2_right.yy",},},
     {"id":{"name":"spr_attack_k3_left","path":"sprites/spr_attack_k3_left/spr_attack_k3_left.yy",},},
@@ -52,9 +54,11 @@
     {"id":{"name":"spr_dungeon","path":"sprites/spr_dungeon/spr_dungeon.yy",},},
     {"id":{"name":"spr_extra_tiles","path":"sprites/spr_extra_tiles/spr_extra_tiles.yy",},},
     {"id":{"name":"spr_ground","path":"sprites/spr_ground/spr_ground.yy",},},
+    {"id":{"name":"spr_hold_prompt","path":"sprites/spr_hold_prompt/spr_hold_prompt.yy",},},
     {"id":{"name":"spr_idle_left","path":"sprites/spr_idle_left/spr_idle_left.yy",},},
     {"id":{"name":"spr_idle_right","path":"sprites/spr_idle_right/spr_idle_right.yy",},},
     {"id":{"name":"spr_inside_castle","path":"sprites/spr_inside_castle/spr_inside_castle.yy",},},
+    {"id":{"name":"spr_interactable","path":"sprites/spr_interactable/spr_interactable.yy",},},
     {"id":{"name":"spr_jump_left","path":"sprites/spr_jump_left/spr_jump_left.yy",},},
     {"id":{"name":"spr_jump_right","path":"sprites/spr_jump_right/spr_jump_right.yy",},},
     {"id":{"name":"spr_mixed","path":"sprites/spr_mixed/spr_mixed.yy",},},
@@ -72,6 +76,7 @@
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
     {"roomId":{"name":"Entrance","path":"rooms/Entrance/Entrance.yy",},},
+    {"roomId":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[
