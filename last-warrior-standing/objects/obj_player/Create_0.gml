@@ -52,3 +52,7 @@ outline_alpha = 0.8;
 // Position of your cooldown box on the screen
 box_x = 32;  // 32 pixels from the left side of the screen
 box_y = 32;  // 32 pixels from the top of the screen
+
+// Health Bar
+hp = 100;     // Or whatever your starting health is
+max_hp = 100; // Your maximum health
