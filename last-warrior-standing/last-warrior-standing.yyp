@@ -64,6 +64,7 @@
     {"id":{"name":"spr_mixed","path":"sprites/spr_mixed/spr_mixed.yy",},},
     {"id":{"name":"spr_outside","path":"sprites/spr_outside/spr_outside.yy",},},
     {"id":{"name":"spr_player","path":"sprites/spr_player/spr_player.yy",},},
+    {"id":{"name":"spr_room2","path":"sprites/spr_room2/spr_room2.yy",},},
     {"id":{"name":"spr_sewer","path":"sprites/spr_sewer/spr_sewer.yy",},},
     {"id":{"name":"spr_spell_left","path":"sprites/spr_spell_left/spr_spell_left.yy",},},
     {"id":{"name":"spr_spell_right","path":"sprites/spr_spell_right/spr_spell_right.yy",},},
