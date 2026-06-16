@@ -77,8 +77,12 @@ if (dash_cooldown_timer > 0) {
 }
 
 
-// --- B. RIGHT WING: SPELL NODE WITH NEON CONTRAST RING ---
-var spell_x = block_x2 - 32;
+// Is Spell 2 Unlocked Tracker
+var is_spell2_unlocked = variable_instance_exists(id, "has_sword") && has_sword;
+
+// --- B. SPELL 1 NODE (SHIFTS POSITION DEPENDING ON UNLOCK STATUS) ---
+// If Spell 2 is active, Spell 1 moves inward to make room on the right side.
+var spell_x = (is_spell2_unlocked) ? (block_x2 - 86) : (block_x2 - 32);
 
 // High-contrast outer frame glow (Severs it visually from the dark chassis)
 draw_set_color(c_black); 
@@ -106,12 +110,50 @@ if (spell_cooldown_timer > 0) {
 }
 
 
+// --- C. ABSOLUTE FAR RIGHT WING: NEW SPELL 2 NODE (F) ---
+var spell2_x = block_x2 - 32; // Anchored directly on the outer edge right of Spell 1
+
+if (is_spell2_unlocked) {
+    // High-contrast outer frame glow
+    draw_set_color(c_black); 
+    draw_circle(spell2_x, slot_y, slot_radius + 2, false);
+    draw_set_color(neon_green); 
+    draw_circle(spell2_x, slot_y, slot_radius + 1, false);
+
+    // Inset background window for the art
+    draw_set_color(make_color_rgb(40, 44, 50)); 
+    draw_circle(spell2_x, slot_y, slot_radius, false);
+
+    // Scale & project spell 2 art
+    if (sprite_exists(spr_spell2_icon)) {
+        var s2_w = sprite_get_width(spr_spell2_icon);
+        var s2_h = sprite_get_height(spr_spell2_icon);
+        var s2_scale = (slot_radius * 1.6) / max(s2_w, s2_h);
+        var s2_draw_x = spell2_x - ((s2_w * s2_scale) / 2);
+        var s2_draw_y = slot_y - ((s2_h * s2_scale) / 2);
+        draw_sprite_ext(spr_spell2_icon, 0, s2_draw_x, s2_draw_y, s2_scale, s2_scale, 0, c_white, 1.0);
+    } else {
+        // Safe programmatic fallback placeholder if asset missing
+        draw_set_color(c_purple);
+        draw_circle(spell2_x, slot_y, slot_radius - 4, false);
+    }
+
+    // Cooldown Shade Matrix (Using proper maximum tracking variables)
+    if (variable_instance_exists(id, "spell2_cooldown_timer") && spell2_cooldown_timer > 0) {
+        draw_set_alpha(0.75); draw_set_color(c_black); draw_circle(spell2_x, slot_y, slot_radius, false); draw_set_alpha(1.0);
+        var display_time = string_format(spell2_cooldown_timer / current_fps, 0, 1) + "s";
+        draw_set_color(c_black); draw_text(spell2_x + 1, slot_y + 1, display_time);
+        draw_set_color(c_white); draw_text(spell2_x, slot_y, display_time);
+    }
+}
+
+
 // =========================================================================
-// LEVEL 3: EXTENDED CENTRAL INSET HEALTH BAR
+// LEVEL 3: EXTENDED CENTRAL INSET HEALTH BAR (DYNAMIC FLUID RE-ANCHORING)
 // =========================================================================
-// Calculates a much longer width bridging the gap between the isolated wing nodes
 var hp_x1 = dash_x + slot_radius + 16;
-var hp_x2 = spell_x - slot_radius - 16;
+// Dynamic anchoring bridges left-side up to whichever spell node is furthest inside
+var hp_x2 = (is_spell2_unlocked) ? (spell_x - slot_radius - 16) : (spell_x - slot_radius - 16);
 var hp_h  = 16; // Bumped up slightly to cleanly frame the internal numbers
 var hp_y1 = base_y - (hp_h / 2);
 var hp_y2 = hp_y1 + hp_h;
@@ -141,16 +183,17 @@ draw_set_valign(fa_middle);
 
 var hp_string = string(floor(current_hp)) + " / " + string(floor(maximum_hp));
 
-// Perfectly centered inside the fluid math line, offset -1px for optical balance
+// Calculate the precise visual center of the dynamic health bar width
+var bar_center_x = hp_x1 + ((hp_x2 - hp_x1) / 2);
 var text_center_y = hp_y1 + (hp_h / 2) - 1;
 
 // Sharp shadow displacement (Protects readability against the bright neon green)
 draw_set_color(c_black); 
-draw_text(center_x + 2, text_center_y + 2, hp_string);
+draw_text(bar_center_x + 2, text_center_y + 2, hp_string);
 
 // Foreground numbers
 draw_set_color(c_white); 
-draw_text(center_x, text_center_y, hp_string);
+draw_text(bar_center_x, text_center_y, hp_string);
 
 
 // =========================================================================
@@ -162,6 +205,13 @@ var key_y = block_y2 + 16; // Shifted slightly lower to give the bigger sprite b
 var dash_key_text = "SHIFT";
 draw_set_color(c_black);  draw_text(dash_x + 1, key_y + 1, dash_key_text);
 draw_set_color(c_dkgray); draw_text(dash_x, key_y, dash_key_text);
+
+// Spell 2 Floating Keybind Label (Drawn underneath the far right slot only when active)
+if (is_spell2_unlocked) {
+    var spell2_key_text = "F";
+    draw_set_color(c_black);  draw_text(spell2_x + 1, key_y + 1, spell2_key_text);
+    draw_set_color(c_dkgray); draw_text(spell2_x, key_y, spell2_key_text);
+}
 
 // Spell Input Sprite Configuration
 var input_spr_w = sprite_get_width(spr_spell1_input_icon);
@@ -201,7 +251,7 @@ draw_sprite_ext(spr_spell1_input_icon, 0, input_draw_x, input_draw_y, input_scal
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 // Only draw the popup if the timer is currently active
-if (key_popup_timer > 0) {
+if (instructions_popup_timer > 0) {
     
     // Set text alignment to center so it looks professional
     draw_set_halign(fa_center);
@@ -209,11 +259,11 @@ if (key_popup_timer > 0) {
     
     // 1. Draw a tiny shadow background for readability
     draw_set_color(c_black);
-    draw_text((display_get_gui_width() / 2) + 2, 34, "KEY OBTAINED (1/1)");
+    draw_text((display_get_gui_width() / 2) + 2, 34, "INSTRUCTIONS OBTAINED (1/1)");
     
     // 2. Draw the main white text exactly in the top center of the screen
     draw_set_color(c_white);
-    draw_text(display_get_gui_width() / 2, 32, "KEY OBTAINED (1/1)");
+    draw_text(display_get_gui_width() / 2, 32, "INSTRUCTIONS OBTAINED (1/1)");
     
     // Reset structural draw alignments so other menus don't break
     draw_set_halign(fa_left);

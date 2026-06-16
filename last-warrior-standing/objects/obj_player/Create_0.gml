@@ -1,9 +1,10 @@
 // COLLECTING STUFF
 interact_timer = 0;
 // INVENTORY
-has_key = false;
-key_popup_timer = 0;       // Keeps track of how long the text stays on screen
-key_popup_max_time = 180;  // 180 frames = 3 seconds at 60FPS
+has_instructions = false;
+has_sword = false;
+instructions_popup_timer = 0;       // Keeps track of how long the text stays on screen
+instructions_popup_max_time = 180;  // 180 frames = 3 seconds at 60FPS
 
 // MOVEMENT VARIABLES
 move_speed = 3;
@@ -17,7 +18,8 @@ move_y = 0;
 attack_combo = 0;
 spell_cooldown_timer = 0; 
 spell_cooldown_max = 240;
-
+spell2_cooldown_timer = 0;
+spell2_cooldown_max = 300; 
 // DASH 
 // Speed
 dash_speed = 7;
@@ -35,7 +37,8 @@ is_dashing = false;
 is_attacking = false;
 is_crouching = false;
 is_crouch_attacking = false;
- 
+is_wall_hanging = false;
+
 // Blocker
 blocked_speed = 1;
 
