@@ -200,3 +200,22 @@ draw_sprite_ext(spr_spell1_input_icon, 0, input_draw_x, input_draw_y, input_scal
 // --- ENGINE STORAGE HOUSEKEEPING ---
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
+// Only draw the popup if the timer is currently active
+if (key_popup_timer > 0) {
+    
+    // Set text alignment to center so it looks professional
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_top);
+    
+    // 1. Draw a tiny shadow background for readability
+    draw_set_color(c_black);
+    draw_text((display_get_gui_width() / 2) + 2, 34, "KEY OBTAINED (1/1)");
+    
+    // 2. Draw the main white text exactly in the top center of the screen
+    draw_set_color(c_white);
+    draw_text(display_get_gui_width() / 2, 32, "KEY OBTAINED (1/1)");
+    
+    // Reset structural draw alignments so other menus don't break
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}

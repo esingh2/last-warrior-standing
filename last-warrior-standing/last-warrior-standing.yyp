@@ -77,13 +77,17 @@
     {"id":{"name":"spr_spell1_input_icon","path":"sprites/spr_spell1_input_icon/spr_spell1_input_icon.yy",},},
     {"id":{"name":"spr_walk_left","path":"sprites/spr_walk_left/spr_walk_left.yy",},},
     {"id":{"name":"spr_walk_right","path":"sprites/spr_walk_right/spr_walk_right.yy",},},
+    {"id":{"name":"spr_wall_climb_left","path":"sprites/spr_wall_climb_left/spr_wall_climb_left.yy",},},
+    {"id":{"name":"spr_wall_climb_right","path":"sprites/spr_wall_climb_right/spr_wall_climb_right.yy",},},
+    {"id":{"name":"spr_wall_hang_left","path":"sprites/spr_wall_hang_left/spr_wall_hang_left.yy",},},
+    {"id":{"name":"spr_wall_hang_right","path":"sprites/spr_wall_hang_right/spr_wall_hang_right.yy",},},
     {"id":{"name":"ts_castle_outside","path":"tilesets/ts_castle_outside/ts_castle_outside.yy",},},
   ],
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
     {"roomId":{"name":"Entrance","path":"rooms/Entrance/Entrance.yy",},},
+    {"roomId":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[

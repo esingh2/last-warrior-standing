@@ -1,5 +1,9 @@
 // COLLECTING STUFF
 interact_timer = 0;
+// INVENTORY
+has_key = false;
+key_popup_timer = 0;       // Keeps track of how long the text stays on screen
+key_popup_max_time = 180;  // 180 frames = 3 seconds at 60FPS
 
 // MOVEMENT VARIABLES
 move_speed = 3;

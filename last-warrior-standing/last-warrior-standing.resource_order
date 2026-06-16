@@ -54,5 +54,9 @@
     {"name":"spr_spell1_icon","order":13,"path":"sprites/spr_spell1_icon/spr_spell1_icon.yy",},
     {"name":"spr_spell1_input_icon","order":14,"path":"sprites/spr_spell1_input_icon/spr_spell1_input_icon.yy",},
     {"name":"spr_walk_left","order":1,"path":"sprites/spr_walk_left/spr_walk_left.yy",},
+    {"name":"spr_wall_climb_left","order":21,"path":"sprites/spr_wall_climb_left/spr_wall_climb_left.yy",},
+    {"name":"spr_wall_climb_right","order":20,"path":"sprites/spr_wall_climb_right/spr_wall_climb_right.yy",},
+    {"name":"spr_wall_hang_left","order":23,"path":"sprites/spr_wall_hang_left/spr_wall_hang_left.yy",},
+    {"name":"spr_wall_hang_right","order":22,"path":"sprites/spr_wall_hang_right/spr_wall_hang_right.yy",},
   ],
 }

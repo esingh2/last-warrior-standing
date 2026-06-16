@@ -52,11 +52,11 @@ gpu_set_fog(false, c_white, 0, 0);
 draw_self();
 
 // 6. DRAW UI PROMPT PROGRESS CIRCLE IF CLOSE TO AN INTERACTABLE
-// Uses a 2-pixel look-ahead padding so it still works when pressing against solid NPCs
-if (place_meeting(x + 2, y, obj_interactable) || 
-    place_meeting(x - 2, y, obj_interactable) || 
-    place_meeting(x, y + 2, obj_interactable) || 
-    place_meeting(x, y - 2, obj_interactable)) {
+// Increased look-ahead padding to 8 pixels so it reads through the chest's blocker object!
+if (place_meeting(x + 8, y, obj_interactable) || 
+    place_meeting(x - 8, y, obj_interactable) || 
+    place_meeting(x, y + 8, obj_interactable) || 
+    place_meeting(x, y - 8, obj_interactable)) {
     
     var _ui_x = x;
     var _ui_y = bbox_top - 10; 

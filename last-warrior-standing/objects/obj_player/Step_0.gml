@@ -8,6 +8,10 @@ if (portal_cooldown > 0) {
     portal_cooldown--;
 }
 
+// Tick down the key popup display timer
+if (key_popup_timer > 0) {
+    key_popup_timer--;
+}
 // 1. INPUTS & DIRECTION
 var move_dir = keyboard_check(ord("D")) - keyboard_check(ord("A"));
 jump_pressed = keyboard_check_pressed(vk_space);
@@ -178,9 +182,10 @@ if (y < -200 || y > room_height+20 || x < -20 || x > room_width+20) {
 move_and_collide(move_x, move_y, [ground_object, blocker_object, obj_npc_main]);
 
 // INTERACTABLES (Padded checking to read through solid collisions)
-var _interact_target = instance_place(x + (facing * 2), y, obj_interactable);
-if (_interact_target == noone) _interact_target = instance_place(x, y + 2, obj_interactable);
-if (_interact_target == noone) _interact_target = instance_place(x, y - 2, obj_interactable);
+// INTERACTABLES (Increased padding to read through solid blocker object blocks)
+var _interact_target = instance_place(x + (facing * 8), y, obj_interactable);
+if (_interact_target == noone) _interact_target = instance_place(x, y + 8, obj_interactable);
+if (_interact_target == noone) _interact_target = instance_place(x, y - 8, obj_interactable);
 
 if (_interact_target != noone) {
     if (keyboard_check(ord("E"))) {
@@ -191,7 +196,20 @@ if (_interact_target != noone) {
                     if (room_exists(room_next(room))) room_goto_next();
                     break;
                 case "chest":
-                    show_debug_message("Opened a chest!");
+                    // 1. Give the player the key
+                    has_key = true;
+                    show_debug_message("Opened a chest and obtained a Key!");
+                    
+                    // 2. Start the UI display timer!
+                    key_popup_timer = key_popup_max_time;
+                    
+                    // 3. Tell the specific chest instance it is now opened
+                    with (_interact_target) {
+                        if (variable_instance_exists(id, "spr_chest_open")) {
+                            sprite_index = spr_chest_open;
+                        }
+                        action_type = "opened_chest"; 
+                    }
                     break;
                 case "lever":
                     show_debug_message("Pulled a lever!");
