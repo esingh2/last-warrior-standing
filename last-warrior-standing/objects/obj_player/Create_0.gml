@@ -31,8 +31,6 @@ is_dashing = false;
 is_attacking = false;
 is_crouching = false;
 is_crouch_attacking = false;
- // is_climbing = false;
- // climb_speed = 2.5;
  
 // Blocker
 blocked_speed = 1;
@@ -44,15 +42,28 @@ room_object = obj_interactable
 
 // --- SOLID LIGHT GRAY OUTLINE (NO GAP) ---
 player_surf = -1;
-outline_thickness = 1;   // Kept at a solid 1-pixel thickness for sharp edges
-outline_gap = 0;         // <-- Removed the gap completely!
-outline_color = c_ltgray; // Your favorite soft light gray color
+outline_thickness = 1;   
+outline_gap = 0;         
+outline_color = c_ltgray; 
 outline_alpha = 0.8;
 
 // Position of your cooldown box on the screen
-box_x = 32;  // 32 pixels from the left side of the screen
-box_y = 32;  // 32 pixels from the top of the screen
+box_x = 32;  
+box_y = 32;  
 
 // Health Bar
-hp = 100;     // Or whatever your starting health is
-max_hp = 100; // Your maximum health
+hp = 100;     
+max_hp = 100; 
+
+// Inherit any base NPC variables if you use a parent object
+event_inherited();
+
+destroy_after_dialogue = true; 
+
+// Dialogue tracking
+dialogue_text = "Thank you for listening! My business here is finished. Goodbye!";
+is_talking = false;
+
+// Portal
+is_teleporting = false;
+portal_cooldown = 0;

@@ -34,10 +34,9 @@ draw_sprite_ext(sprite_index, image_index, local_x, local_y, image_xscale, image
 surface_reset_target();
 
 // 4. DRAW THE SURFACE AS A SOLID, SHARP LIGHT GRAY HALO
-gpu_set_texfilter(false); // <-- Keeps the line perfectly solid and crisp, just like you liked!
+gpu_set_texfilter(false); 
 gpu_set_fog(true, outline_color, 0, 0); 
 
-// ONLY ONE LOOP RUNNING (4-WAY CROSS FOR MAXIMUM CLEAN LINES)
 var directions = [0, 90, 180, 270];
 for (var i = 0; i < 4; i++) {
     var angle_rad = degtorad(directions[i]);
@@ -50,34 +49,35 @@ for (var i = 0; i < 4; i++) {
 gpu_set_fog(false, c_white, 0, 0);
 
 // 5. DRAW THE REAL PLAYER DIRECTLY ON TOP (IN FULL COLOR)
-draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
-
 draw_self();
 
-// Draw UI if touching any interactable object
-if (place_meeting(x, y, obj_interactable)) {
+// 6. DRAW UI PROMPT PROGRESS CIRCLE IF CLOSE TO AN INTERACTABLE
+// Uses a 2-pixel look-ahead padding so it still works when pressing against solid NPCs
+if (place_meeting(x + 2, y, obj_interactable) || 
+    place_meeting(x - 2, y, obj_interactable) || 
+    place_meeting(x, y + 2, obj_interactable) || 
+    place_meeting(x, y - 2, obj_interactable)) {
+    
     var _ui_x = x;
     var _ui_y = bbox_top - 10; 
     
-    // 1. DRAW THE BACKGROUND CIRCLE (Reduced radius from 20 to 14)
+    // Draw background circle
     var _circle_radius = 14; 
     draw_set_color(c_dkgray);
     draw_circle(_ui_x, _ui_y, _circle_radius, false); 
     
-    // 2. DRAW AND SCALE THE SPRITE (Reduced scale from 0.12 to 0.08 to fit the smaller circle)
+    // Draw hold prompt icon
     var _scale = 0.06; 
-    
-    // draw_sprite_ext(sprite, subimg, x, y, xscale, yscale, rot, color, alpha);
     draw_sprite_ext(spr_hold_prompt, -1, _ui_x, _ui_y, _scale, _scale, 0, c_white, 1);
     
-    // 3. DRAW THE CLOCKWISE PROGRESS RING
+    // Draw clockwise progress ring
     var _progress = (interact_timer / 90) * 360; 
     
     if (_progress > 0) {
         draw_set_color(c_lime);
         
         var _sections = 32; 
-        var _ring_thickness = 3; // Slimmed down the ring thickness slightly to match
+        var _ring_thickness = 3; 
         
         draw_primitive_begin(pr_trianglestrip);
         for (var i = 0; i <= _sections; i++) {
@@ -86,7 +86,6 @@ if (place_meeting(x, y, obj_interactable)) {
             
             var _rad = degtorad(_angle);
             
-            // Outer and Inner edges dynamically adjust to the new _circle_radius
             var _ox = _ui_x + cos(_rad) * (_circle_radius + 2);
             var _oy = _ui_y + sin(_rad) * (_circle_radius + 2);
             var _ix = _ui_x + cos(_rad) * (_circle_radius + 2 - _ring_thickness);

@@ -1,3 +1,13 @@
+// If a text box exists, freeze the player and skip the rest of the step event
+if (instance_exists(obj_textbox)) {
+    exit; 
+}
+
+// Tick down the portal safety cooldown
+if (portal_cooldown > 0) {
+    portal_cooldown--;
+}
+
 // 1. INPUTS & DIRECTION
 var move_dir = keyboard_check(ord("D")) - keyboard_check(ord("A"));
 jump_pressed = keyboard_check_pressed(vk_space);
@@ -11,7 +21,7 @@ if (move_dir != 0) {
     facing = move_dir;
 }
 
-// CROUCH CHECK (Only on the ground, and not during locked states)
+// CROUCH CHECK
 if (is_grounded && crouch_input && !is_dashing && !is_attacking) {
     is_crouching = true;
 } else {
@@ -20,24 +30,17 @@ if (is_grounded && crouch_input && !is_dashing && !is_attacking) {
 
 // TRIGGER ATTACK 
 if (attack_input && !is_dashing && !is_attacking && !is_crouch_attacking) { 
-    
-    // Update facing direction based on mouse position first
     if (mouse_x > x) facing = 1;
     else facing = -1;
 
     if (is_crouching) {
-        // Trigger Crouch Attack
         is_crouch_attacking = true;
         image_index = 0;
-        
         if (facing == 1) sprite_index = spr_crouch_attack_right;
         else sprite_index = spr_crouch_attack_left;
-        
     } else {
-        // Trigger Normal Attack Combo
         is_attacking = true;
         image_index = 0;
-        
         if (attack_combo == 0) {
             if (facing == 1) sprite_index = spr_attack_right;
             else sprite_index = spr_attack_left;
@@ -51,17 +54,14 @@ if (attack_input && !is_dashing && !is_attacking && !is_crouch_attacking) {
     }
 }
 
-// TRIGGER SPELL (Prevent casting mid-crouch-attack)
+// TRIGGER SPELL
 if (spell_input && spell_cooldown_timer <= 0 && !is_dashing && !is_attacking && !is_crouch_attacking) {
-    is_attacking = true; // Treats spellcast as normal attack state lock
+    is_attacking = true; 
     image_index = 0;
-    
     if (mouse_x > x) facing = 1;
     else facing = -1;
-    
     if (facing == 1) sprite_index = spr_spell_right;
     else sprite_index = spr_spell_left;
-
     spell_cooldown_timer = spell_cooldown_max;
 }
 
@@ -71,88 +71,59 @@ if (dash_input && dash_cooldown_timer <= 0 && !is_dashing && !is_attacking && mo
     dash_timer = dash_time;
 }
 
-// Dash Cooldown Timer
-if (dash_cooldown_timer > 0) {
-    dash_cooldown_timer--;
-}
+if (dash_cooldown_timer > 0) dash_cooldown_timer--;
+if (spell_cooldown_timer > 0) spell_cooldown_timer--;
 
-// Spell Cooldown Timer
-if (spell_cooldown_timer > 0) {
-    spell_cooldown_timer--;
-}
-
-// ==========================================
-// BLOCKER SPEED MODIFIER CALCULATIONS
-// ==========================================
+// BLOCKER CALCULATIONS
 var _h_modifier = 1.0;
 var _v_modifier = 1.0;
 
-// HORIZONTAL MODIFIER: Uses look-ahead so you don't get stuck entering/leaving walls
 if (place_meeting(x + move_dir * move_speed, y, blocker_object) || place_meeting(x, y, blocker_object)) {
     _h_modifier = blocked_speed / move_speed;
 }
-
-// VERTICAL MODIFIER: Only applies if you are physically inside/touching it right now!
 if (place_meeting(x, y, blocker_object)) {
     _v_modifier = blocked_speed / move_speed; 
 }
 
-
-// ==========================================
 // MOVEMENT STATES
-// ==========================================
 if (is_attacking || is_crouch_attacking) {
     move_x = 0;
-    
-    // Gravity calculation during attack (slowed down if in blocker)
     if (!is_grounded && move_y < max_fall_speed) {
         move_y += gravity_force * _v_modifier;
     }
 }
 else if (is_dashing) {
-    // Dash speed is now dragged down by the blocker modifier
     move_x = (facing * dash_speed) * _h_modifier;
-    move_y = 0; // Keep vertical movement locked during dash
+    move_y = 0;
     dash_timer--;
-    
-    // Check if dash finished
     if (dash_timer <= 0) {
         is_dashing = false;
         dash_cooldown_timer = dash_cooldown; 
     }
 } 
 else if (is_crouching) {
-    // Crouch walk speed affected by the blocker modifier
     move_x = move_dir * (move_speed * 0.4) * _h_modifier;
 }
 else {
-    // Normal walking movement affected by the blocker modifier
     move_x = move_dir * move_speed * _h_modifier; 
 }
 
-
-// ==========================================
-// 4. VERTICAL MOVEMENT (Jumping / Gravity)
-// ==========================================
-// Check for ground and ceiling using BOTH the ground object and the blocker object
+// VERTICAL MOVEMENT
 is_grounded = place_meeting(x, y+2, ground_object) || place_meeting(x, y+2, blocker_object);
 is_ceiling = place_meeting(x, y-2, ground_object) || place_meeting(x, y-2, blocker_object);
 
 if (is_grounded) {
     move_y = 0;
     if (jump_pressed && !is_attacking && !is_crouch_attacking && !is_crouching) { 
-        // Jump height behaves perfectly normal outside, but gets restricted inside
         move_y = jump_speed * _v_modifier;
     }
 } else if (!is_attacking && !is_crouch_attacking && move_y < max_fall_speed) { 
-    // Falling is slowed down only inside the blocker
     move_y += gravity_force * _v_modifier;
 }
 
 if (is_ceiling && move_y < 0) {
     move_y = 0;
 }
-
 
 // PLAYER ANIMATIONS
 if (is_crouch_attacking) {
@@ -163,110 +134,81 @@ else if (is_attacking) {
 }
 else if (is_dashing) {
     image_speed = 1;
-    if (facing == 1) {
-        sprite_index = spr_dash_right;
-    } else { 
-        sprite_index = spr_dash_left;
-    }
+    if (facing == 1) sprite_index = spr_dash_right;
+    else sprite_index = spr_dash_left;
 } 
 else if (!is_grounded) {
-    if (facing == 1) {
-        sprite_index = spr_jump_right; 
-    } else {
-        sprite_index = spr_jump_left; 
-    }
+    if (facing == 1) sprite_index = spr_jump_right; 
+    else sprite_index = spr_jump_left;
     
     image_speed = 0; 
-    
-    if (move_y < -1) {
-        image_index = 0; 
-    } 
-    else if (move_y >= -1 && move_y <= 1) {
-        image_index = 1; 
-    } 
-    else {
-        image_index = 2; 
-    }
+    if (move_y < -1) image_index = 0; 
+    else if (move_y >= -1 && move_y <= 1) image_index = 1; 
+    else image_index = 2; 
 }
 else if (is_crouching) {
     var target_crouch_sprite = (facing == 1) ? spr_crouch_right : spr_crouch_left;
-    
-    // Only change the sprite if we aren't already using it (prevents animation resetting)
     if (sprite_index != target_crouch_sprite) {
         sprite_index = target_crouch_sprite;
-        image_index = 0; // Start the transition cleanly
+        image_index = 0;
     }
-    
-    // If the animation reaches the last frame, freeze it there so they stay down
     if (image_index >= image_number - 1) {
         image_speed = 0;
         image_index = image_number - 1; 
     } else {
-        image_speed = 1; // Play the crouch-down transition
+        image_speed = 1;
     }
 }
 else {
     image_speed = 1; 
-    
-    if (move_dir > 0) {
-        sprite_index = spr_walk_right;
-    }
-    else if (move_dir < 0) {
-        sprite_index = spr_walk_left;
-    }
+    if (move_dir > 0) sprite_index = spr_walk_right;
+    else if (move_dir < 0) sprite_index = spr_walk_left;
     else {
-        if (facing == 1) {
-            sprite_index = spr_idle_right;
-        } else {
-            sprite_index = spr_idle_left;
-        }
+        if (facing == 1) sprite_index = spr_idle_right;
+        else sprite_index = spr_idle_left;
     }
 }
 
-// 5. ROOM BOUNDS & COLLISIONS
+// ROOM BOUNDS
 if (y < -200 || y > room_height+20 || x < -20 || x > room_width+20) {
     room_restart();
 }
 
-// ACTUALLY MOVE THE PLAYER (Accepts both solid structures as an array)
-move_and_collide(move_x, move_y, [ground_object, blocker_object]);
+// MOVE PLAYER
+move_and_collide(move_x, move_y, [ground_object, blocker_object, obj_npc_main]);
 
-// COLLECTED
-
-// GO TO NEXT ROOM
-// 1. Check if we are touching ANY interactable object
-var _interact_target = instance_place(x, y, obj_interactable);
+// INTERACTABLES (Padded checking to read through solid collisions)
+var _interact_target = instance_place(x + (facing * 2), y, obj_interactable);
+if (_interact_target == noone) _interact_target = instance_place(x, y + 2, obj_interactable);
+if (_interact_target == noone) _interact_target = instance_place(x, y - 2, obj_interactable);
 
 if (_interact_target != noone) {
-    // 2. If holding "E", increase the timer
     if (keyboard_check(ord("E"))) {
         interact_timer += 1; 
-        
-        // Timer completes at 90 frames (1.5 seconds)
         if (interact_timer >= 90) {
-            
-            // --- THE ACTION SWITCHBOARD ---
-            // This reads the specific variable from the object we are touching!
             switch (_interact_target.action_type) {
-                
                 case "next_room":
-                    if (room_exists(room_next(room))) {
-                        room_goto_next();
-                    }
+                    if (room_exists(room_next(room))) room_goto_next();
                     break;
-                    
                 case "chest":
-                    // You can add chest-opening logic here later!
                     show_debug_message("Opened a chest!");
                     break;
-                    
                 case "lever":
-                    // You can add lever-pulling logic here later!
                     show_debug_message("Pulled a lever!");
                     break;
+                case "npc":
+                    var _dialogue = variable_instance_exists(_interact_target, "dialogue_text") ? _interact_target.dialogue_text : "Hello!";
+                    var _should_fade = variable_instance_exists(_interact_target, "destroy_after_dialogue") ? _interact_target.destroy_after_dialogue : false;
+                    var _box = instance_create_layer(0, 0, "Instances", obj_textbox);
+                    _box.text_message = _dialogue;
+                    if (_should_fade) {
+                        with (_interact_target) {
+                            is_fading = true;
+                            mask_index = -1;
+                        }
+                    }
+                    break;
             }
-            
-            // Reset the timer after the action happens so it doesn't loop
             interact_timer = 0;
         }
     } else {
