@@ -1,11 +1,9 @@
 {
   "$GMObject":"",
-  "%Name":"obj_blocker",
-  "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+  "%Name":"obj_enemy",
+  "eventList":[],
   "managed":true,
-  "name":"obj_blocker",
+  "name":"obj_enemy",
   "overriddenProperties":[],
   "parent":{
     "name":"Objects",
@@ -30,10 +28,10 @@
   ],
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
-  "solid":true,
+  "solid":false,
   "spriteId":{
-    "name":"spr_blocker",
-    "path":"sprites/spr_blocker/spr_blocker.yy",
+    "name":"spr_enemy",
+    "path":"sprites/spr_enemy/spr_enemy.yy",
   },
   "spriteMaskId":null,
   "visible":false,

@@ -12,6 +12,7 @@ if (portal_cooldown > 0) {
 if (instructions_popup_timer > 0) {
     instructions_popup_timer--;
 }
+
 // 1. INPUTS & DIRECTION
 var move_dir = keyboard_check(ord("D")) - keyboard_check(ord("A"));
 jump_pressed = keyboard_check_pressed(vk_space);
@@ -84,16 +85,14 @@ if (spell2_input && variable_instance_exists(id, "has_sword") && has_sword) {
         spell2_cooldown_timer = spell2_cooldown_max;
 
         // --- SPECIAL WALL DESTRUCTION LOGIC ---
-        // Look ahead based on your current facing direction (32-pixel length reach)
         var check_distance = 32;
         var target_x = x + (facing * check_distance);
         var target_y = y;
 
-        // Perform instant attack check for obj_wall
         var hit_wall = instance_place(target_x, target_y, obj_wall);
         if (hit_wall != noone) {
             with (hit_wall) {
-                instance_destroy(); // Obliterate the wall!
+                instance_destroy(); 
             }
         }
     }
@@ -109,14 +108,21 @@ if (dash_cooldown_timer > 0) dash_cooldown_timer--;
 if (spell_cooldown_timer > 0) spell_cooldown_timer--;
 if (variable_instance_exists(id, "spell2_cooldown_timer") && spell2_cooldown_timer > 0) spell2_cooldown_timer--;
 
-// BLOCKER CALCULATIONS
+// ==========================================
+// FIXED BLOCKER CALCULATIONS (IGNORES INACTIVE)
+// ==========================================
 var _h_modifier = 1.0;
 var _v_modifier = 1.0;
 
-if (place_meeting(x + move_dir * move_speed, y, blocker_object) || place_meeting(x, y, blocker_object)) {
+var _h_blocker = instance_place(x + move_dir * move_speed, y, blocker_object);
+if (_h_blocker == noone) _h_blocker = instance_place(x, y, blocker_object); 
+
+if (_h_blocker != noone && _h_blocker.is_active) {
     _h_modifier = blocked_speed / move_speed;
 }
-if (place_meeting(x, y, blocker_object)) {
+
+var _v_blocker = instance_place(x, y, blocker_object);
+if (_v_blocker != noone && _v_blocker.is_active) {
     _v_modifier = blocked_speed / move_speed; 
 }
 
@@ -148,26 +154,41 @@ else {
 // ==========================================
 var bridge_grounded = false;
 
-// 1. Check if we are touching a visible bridge slope
 var hit_bridge = instance_place(x, y + 2, obj_wall_bridge);
 if (hit_bridge != noone && hit_bridge.visible) {
     bridge_grounded = true;
 }
 
-// 2. Combine all grounded factors
-is_grounded = place_meeting(x, y + 2, ground_object) || place_meeting(x, y + 2, blocker_object) || bridge_grounded;
-is_ceiling = place_meeting(x, y - 2, ground_object) || place_meeting(x, y - 2, blocker_object);
+var _ground_below = instance_place(x, y + 2, ground_object);
+var _ground_grounded = (_ground_below != noone);
+
+// Only filter out structural puzzle ground chunks if they are specifically marked and inactive
+if (_ground_below != noone && variable_instance_exists(_ground_below, "is_puzzle_ground")) {
+    if (!_ground_below.is_active) _ground_grounded = false;
+}
+
+var _ground_above = instance_place(x, y - 2, ground_object);
+var _ground_ceiling = (_ground_above != noone);
+if (_ground_above != noone && variable_instance_exists(_ground_above, "is_puzzle_ground")) {
+    if (!_ground_above.is_active) _ground_ceiling = false;
+}
+
+var _blocker_below = instance_place(x, y + 2, blocker_object);
+var _blocker_grounded = (_blocker_below != noone && _blocker_below.is_active);
+
+var _blocker_above = instance_place(x, y - 2, blocker_object);
+var _blocker_ceiling = (_blocker_above != noone && _blocker_above.is_active);
+
+is_grounded = _ground_grounded || _blocker_grounded || bridge_grounded;
+is_ceiling = _ground_ceiling || _blocker_ceiling;
 
 if (is_grounded) {
-    move_y = 0; // Reset downward force on flat ground AND bridge slopes
-    
-    // Jump input handling
+    move_y = 0; 
     if (jump_pressed && !is_attacking && !is_crouch_attacking && !is_crouching) { 
         move_y = jump_speed * _v_modifier;
     }
 } 
 else if (!is_attacking && !is_crouch_attacking && move_y < max_fall_speed) { 
-    // Only apply gravity if you are truly airborne and NOT on a bridge slope
     move_y += gravity_force * _v_modifier;
 }
 
@@ -224,14 +245,21 @@ if (y < -200 || y > room_height+20 || x < -20 || x > room_width+20) {
     room_restart();
 }
 
-
 // =========================================================================
-// FIXED WALL JUMP & WALL HANG MECHANICS (EXCLUDES ELEVATED BRIDGES)
+// WALL JUMP & WALL HANG MECHANICS
 // =========================================================================
-
-// Check if actual structural ground is to our sides
 var basic_wall_left  = place_meeting(x - 4, y, ground_object);
 var basic_wall_right = place_meeting(x + 4, y, ground_object);
+
+var _plat_check_left = instance_place(x - 4, y, ground_object);
+if (_plat_check_left != noone && variable_instance_exists(_plat_check_left, "is_puzzle_ground")) {
+    if (!_plat_check_left.is_active) basic_wall_left = false;
+}
+
+var _plat_check_right = instance_place(x + 4, y, ground_object);
+if (_plat_check_right != noone && variable_instance_exists(_plat_check_right, "is_puzzle_ground")) {
+    if (!_plat_check_right.is_active) basic_wall_right = false;
+}
 
 if (!is_grounded && (basic_wall_left || basic_wall_right) && move_y >= 0) {
     is_wall_hanging = true;
@@ -241,13 +269,12 @@ if (!is_grounded && (basic_wall_left || basic_wall_right) && move_y >= 0) {
 
 if (is_wall_hanging) {
     move_y = 0; 
-    
     if (basic_wall_left) {
-        move_x = 0; // Keeping your wall-hang steady fix 
+        move_x = 0; 
         facing = 1; 
         sprite_index = spr_wall_hang_left; 
     } else if (basic_wall_right) {
-        move_x = 0; // Keeping your wall-hang steady fix
+        move_x = 0; 
         facing = -1; 
         sprite_index = spr_wall_hang_right;
     }
@@ -269,64 +296,66 @@ if (is_wall_hanging) {
     }
 }
 
-
 // ==========================================
 // DYNAMIC COLLISION MANAGEMENT FOR MOVE_AND_COLLIDE
 // ==========================================
+var _collision_list = [obj_npc_main, obj_wall];
 
-// 1. Start with your baseline structural solid elements
-var _collision_list = [ground_object, blocker_object, obj_npc_main, obj_wall];
+with(ground_object) {
+    var _can_collide = true;
+    if (variable_instance_exists(id, "is_puzzle_ground")) {
+        if (!is_active) {
+            _can_collide = false;
+        }
+    }
+    if (_can_collide) {
+        array_push(_collision_list, id); 
+    }
+}
 
-// 2. Automatically grab EVERY single visible bridge piece in the room 
-//    and inject it directly into the physics engine array.
+with(blocker_object) {
+    if (is_active) {
+        array_push(_collision_list, id);
+    }
+}
+
 with(obj_wall_bridge) {
     if (visible) {
         array_push(_collision_list, id);
     }
 }
 
-// 3. Process native physics collision calculation
 move_and_collide(move_x, move_y, _collision_list);
 
-
 // ==========================================
-// INTERACTABLES & obj_ability_unlock PROCESSING
+// INTERACTABLES PROCESSING
 // ==========================================
-
-// 1. Check for standard interactable objects nearby
 var _interact_target = instance_place(x + (facing * 12), y, obj_interactable);
 if (_interact_target == noone) _interact_target = instance_place(x, y + 12, obj_interactable);
 if (_interact_target == noone) _interact_target = instance_place(x, y - 12, obj_interactable);
-if (_interact_target == noone) _interact_target = instance_place(x, y, obj_interactable); // Backup overlapping check
+if (_interact_target == noone) _interact_target = instance_place(x, y, obj_interactable); 
 
-// 2. Check for obj_ability_unlock within a direct overlapping bounding box
 var _sword_target = instance_place(x, y, obj_ability_unlock);
 if (_sword_target == noone) _sword_target = instance_place(x + (facing * 12), y, obj_ability_unlock);
 if (_sword_target == noone) _sword_target = instance_place(x, y + 12, obj_ability_unlock);
 if (_sword_target == noone) _sword_target = instance_place(x, y - 12, obj_ability_unlock);
 
-// --- INTERACTION HANDLING ---
 if (_interact_target != noone || _sword_target != noone) {
     if (keyboard_check(ord("E"))) {
         interact_timer += 1; 
         if (interact_timer >= 90) {
             
-            // PRIORITIZE SWORD INTERACTION (Only valid if instructions are unlocked first)
             if (_sword_target != noone) {
                 if (variable_instance_exists(id, "has_instructions") && has_instructions) {
                     has_sword = true;
-                    show_debug_message("Retrieved the sword!");
-                    
                     var _sword_box = instance_create_layer(0, 0, "Instances", obj_textbox);
                     _sword_box.text_message = "You gathered both the instructions and the Sword! Spell 2 unlocked! Press F to strike!";
-                    
-                    instance_destroy(_sword_target); // Remove ability unlock object from ground
+                    instance_destroy(_sword_target); 
                 } else {
                     var _fail_box = instance_create_layer(0, 0, "Instances", obj_textbox);
                     _fail_box.text_message = "The sword is locked tight inside. Check the cage mechanisms first.";
                 }
             } 
-            // STANDARD INTERACTABLES SYSTEM
             else if (_interact_target != noone) {
                 switch (_interact_target.action_type) {
                     case "next_room":
@@ -334,7 +363,7 @@ if (_interact_target != noone || _sword_target != noone) {
                         break;
                     case "chest":
                         has_key = true;
-                        has_instructions = true; // Sets logic barrier so sword can now be grabbed
+                        has_instructions = true; 
                         instructions_popup_timer = instructions_popup_max_time;
                         
                         var _chest_box = instance_create_layer(0, 0, "Instances", obj_textbox);
@@ -344,8 +373,54 @@ if (_interact_target != noone || _sword_target != noone) {
                             action_type = "opened_chest"; 
                         }
                         break;
-                    case "lever":
-                        show_debug_message("Pulled a lever!");
+                   case "lever":
+                        var _ground_asset = ground_object; 
+                        
+                        with (_interact_target) {
+                            if (!is_pulled) {
+                                is_pulled = true;
+                                sprite_index = spr_lever_green; 
+                                image_index = 0;
+                                image_speed = 1; 
+                                
+                                var my_group = group_id; 
+                                
+                                // --- 1. VANISH SPECIFIC ARROWS MATCHING THE GROUP ---
+                                with (obj_arrow) {
+                                    if (variable_instance_exists(id, "group_id") && group_id == my_group) {
+                                        instance_destroy();
+                                    }
+                                }
+                                
+                                // --- 2. ACTIVATE BLOCKERS ---
+                                with (other.blocker_object) {
+                                    if (variable_instance_exists(id, "group_id") && group_id == my_group) {
+                                        is_active = true; 
+                                    }
+                                }
+                                
+                                // --- 3. ACTIVATE HIDDEN SOLID GROUND ---
+                                with (_ground_asset) {
+                                    if (variable_instance_exists(id, "group_id") && group_id == my_group) {
+                                        is_active = true; 
+                                    }
+                                }
+                                
+                                // --- 4. MAKE EXISTING PLATFORM VISIBLE ---
+                                with (obj_platform) {
+                                    if (variable_instance_exists(id, "group_id") && group_id == my_group) {
+                                        visible = true;
+                                    }
+                                }
+                                
+                                // --- 5. MAKE EXISTING ENEMY VISIBLE ---
+                                with (obj_enemy) {
+                                    if (variable_instance_exists(id, "group_id") && group_id == my_group) {
+                                        visible = true;
+                                    }
+                                }
+                            }
+                        }
                         break;
                     case "npc":
                         var _dialogue = variable_instance_exists(_interact_target, "dialogue_text") ? _interact_target.dialogue_text : "Hello!";

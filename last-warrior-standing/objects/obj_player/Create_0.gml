@@ -46,7 +46,6 @@ blocked_speed = 1;
 ground_object = obj_ground;
 blocker_object = obj_blocker;
 room_object = obj_interactable
-
 // --- SOLID LIGHT GRAY OUTLINE (NO GAP) ---
 player_surf = -1;
 outline_thickness = 1;   
