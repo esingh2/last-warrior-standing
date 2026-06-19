@@ -143,26 +143,31 @@ else {
     move_x = move_dir * move_speed * _h_modifier; 
 }
 
+// ==========================================
 // VERTICAL MOVEMENT & GROUND RUNTIME CHECK
+// ==========================================
 var bridge_grounded = false;
-with(obj_wall_bridge) {
-    // Only check if player is landing on a visible bridge piece
-    if (visible && place_meeting(x, y - 2, other.id)) {
-        if (other.bbox_bottom <= bbox_top + 4) {
-            bridge_grounded = true;
-        }
-    }
+
+// 1. Check if we are touching a visible bridge slope
+var hit_bridge = instance_place(x, y + 2, obj_wall_bridge);
+if (hit_bridge != noone && hit_bridge.visible) {
+    bridge_grounded = true;
 }
 
-is_grounded = place_meeting(x, y+2, ground_object) || place_meeting(x, y+2, blocker_object) || bridge_grounded;
-is_ceiling = place_meeting(x, y-2, ground_object) || place_meeting(x, y-2, blocker_object);
+// 2. Combine all grounded factors
+is_grounded = place_meeting(x, y + 2, ground_object) || place_meeting(x, y + 2, blocker_object) || bridge_grounded;
+is_ceiling = place_meeting(x, y - 2, ground_object) || place_meeting(x, y - 2, blocker_object);
 
 if (is_grounded) {
-    move_y = 0;
+    move_y = 0; // Reset downward force on flat ground AND bridge slopes
+    
+    // Jump input handling
     if (jump_pressed && !is_attacking && !is_crouch_attacking && !is_crouching) { 
         move_y = jump_speed * _v_modifier;
     }
-} else if (!is_attacking && !is_crouch_attacking && move_y < max_fall_speed) { 
+} 
+else if (!is_attacking && !is_crouch_attacking && move_y < max_fall_speed) { 
+    // Only apply gravity if you are truly airborne and NOT on a bridge slope
     move_y += gravity_force * _v_modifier;
 }
 
@@ -228,10 +233,6 @@ if (y < -200 || y > room_height+20 || x < -20 || x > room_width+20) {
 var basic_wall_left  = place_meeting(x - 4, y, ground_object);
 var basic_wall_right = place_meeting(x + 4, y, ground_object);
 
-// Ignore the wall hang entirely if the thing to our side is a bridge piece
-if (basic_wall_left && place_meeting(x - 4, y, obj_wall_bridge)) basic_wall_left = false;
-if (basic_wall_right && place_meeting(x + 4, y, obj_wall_bridge)) basic_wall_right = false;
-
 if (!is_grounded && (basic_wall_left || basic_wall_right) && move_y >= 0) {
     is_wall_hanging = true;
 } else {
@@ -242,11 +243,11 @@ if (is_wall_hanging) {
     move_y = 0; 
     
     if (basic_wall_left) {
-        move_x = -1; 
+        move_x = 0; // Keeping your wall-hang steady fix 
         facing = 1; 
         sprite_index = spr_wall_hang_left; 
     } else if (basic_wall_right) {
-        move_x = 1; 
+        move_x = 0; // Keeping your wall-hang steady fix
         facing = -1; 
         sprite_index = spr_wall_hang_right;
     }
@@ -273,22 +274,18 @@ if (is_wall_hanging) {
 // DYNAMIC COLLISION MANAGEMENT FOR MOVE_AND_COLLIDE
 // ==========================================
 
-// Build a clean array tracking revealed bridge components dynamically
-var _active_bridges = [];
+// 1. Start with your baseline structural solid elements
+var _collision_list = [ground_object, blocker_object, obj_npc_main, obj_wall];
+
+// 2. Automatically grab EVERY single visible bridge piece in the room 
+//    and inject it directly into the physics engine array.
 with(obj_wall_bridge) {
     if (visible) {
-        // Platforming Safety Net: Only process solid collision if feet land directly on top
-        if (other.bbox_bottom <= bbox_top + 4) {
-            array_push(_active_bridges, id);
-        }
+        array_push(_collision_list, id);
     }
 }
 
-// Combine target engine system blocks with the newly activated bridge blocks
-var _collision_list = [ground_object, blocker_object, obj_npc_main, obj_wall];
-_collision_list = array_concat(_collision_list, _active_bridges);
-
-// Final movement calculation processing 
+// 3. Process native physics collision calculation
 move_and_collide(move_x, move_y, _collision_list);
 
 
